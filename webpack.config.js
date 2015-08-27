@@ -1,31 +1,27 @@
 var webpack = require("webpack");
 var path = require("path");
 var srcDir = path.join(__dirname, 'src/main/frontend');
-var destDir = 'target/classes/static';
+var destDir = path.join(__dirname, "target/classes/static");
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var IndexHtmlPlugin = require('indexhtml-webpack-plugin');
 var cssExtractPlugin = new ExtractTextPlugin('css/[contenthash].css');
-var BowerWebpackPlugin = require("bower-webpack-plugin");
 var glob = require('glob');
-var Clean = require('clean-webpack-plugin');
 var entries = {
 		// if an HTML file references JS, that JS file must be listed here until https://github.com/unbroken-dome/indexhtml-webpack-plugin/issues/2 is resolved
 		'availability': './js/availability.js'
 };
 var plugins = [
-	new Clean([destDir]),
-	new BowerWebpackPlugin(),
 	new webpack.optimize.OccurenceOrderPlugin(),
 	new webpack.optimize.DedupePlugin(),
-	new webpack.optimize.UglifyJsPlugin({
-	    compress: {
-	        warnings: false
-	    }
-	}),
+//	new webpack.optimize.UglifyJsPlugin({
+//	    compress: {
+//	        warnings: false
+//	    }
+//	}),
 	new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 20 }),
 	cssExtractPlugin
 ];
-glob.sync('**/*.html', {cwd: srcDir}).forEach(function(item) {
+glob.sync('**/*.html', {cwd: srcDir}).forEach(function(item) { 
 	entries[item] = ["./" + item];
 	plugins.push(new IndexHtmlPlugin(item, item));
 });
@@ -34,9 +30,6 @@ module.exports = {
 	bail: true,
 	entry: entries,
 	devtool: 'source-map', // must be 'source-map' or 'inline-source-map'
-	resolve:{
-		root: [path.join(__dirname, "node_modules"), path.join(__dirname, "bower_components")]
-	},
 	output: {
 		path: destDir,
 		publicPath: "/",
@@ -68,3 +61,4 @@ module.exports = {
 };
 function escapeRegExpString(str) { return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"); }
 function pathToRegExp(p) { return new RegExp("^" + escapeRegExpString(p)); }
+
